@@ -32,11 +32,10 @@ EOF
 
 echo "Ceforeデーモンを開始します..."
 # cefore_daemonをバックグラウンドで起動
-#/usr/local/bin/cefore_daemon -f "${CEFORE_CONF}" &
-/docker/cefore/whcefore/bash/init.sh
+#/docker/cefore/whcefore/bash/init.sh
 CEFORE_PID=$!
 echo "CeforeデーモンがPID: ${CEFORE_PID} で開始されました"
-
+. /app/bash/init_cefnetd.sh
 # Ceforeデーモンが完全に起動するまで少し待機
 sleep 2
 
@@ -48,6 +47,7 @@ if [ "${NODE_TYPE}" == "router" ]; then
     sudo cefroute add ccnx:/test udp 172.18.0.21 # producer1
     sudo cefroute add ccnx:/test udp 172.18.0.31 # consumer1
     sudo cefroute add ccnx:/test udp 172.18.0.32 # consumer2
+    
     
     sleep 1 # Faceが完全に確立するのを少し待つ
     

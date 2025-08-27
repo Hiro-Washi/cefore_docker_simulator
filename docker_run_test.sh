@@ -1,7 +1,9 @@
 #!/bin/bash
-docker run -it -d -w /app -v ./:/docker -h "test" --name "ceftest2" -p 9890:9896 linuxcontainers/debian-slim 
+docker run -it -d -w /app -v ./:/docker -h "test" --name "ceftest2" -p 9890:9896 linuxcontainers/debian-slim
+docker run --rm -it -d -w /app -v ./:/docker -h "test" --name "cefpyco-test" -p 9896:9896 debian-cefore-router
 # IP: Docker のデフォルトブリッジネットワーク (docker0) は、通常、172.17.0.1/16 のIPアドレス範囲
 docker build -t cefian:dev
+docker build -t debslim-cefapp:0.11.0 -f Dockerfile_debian_cefapp .
 
 (cd tmp)
 

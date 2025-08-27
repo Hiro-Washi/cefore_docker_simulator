@@ -3,13 +3,16 @@
 # Dockerfile: Debian base. Ceforeをビルド・インストール
 # entrypoint.sh: Ceforeデーモンの起動と、各ノード（ルーター、プロデューサー、コンシューマー）に応じたCeforeのFace/FIB設定
 #
+
+#cefore_ep = ". /docker/bash/cefore_ep.sh"
+
 services:
 
   r1:
     # build:
     #   # docker build コマンドを実行したときの、カレントなワーキングディレクトリ
     #   context: .
-    #   dockerfile: Dockerfile
+    #   dockerfile: Dockerfile_debian_cefrouter
     image: debian-cefore-router
     hostname: r1
     environment:
@@ -19,6 +22,7 @@ services:
         source: ./docker
         target: /docker
     tty: true
+    entrypoint: 
     networks:
       cefore_network:
         ipv4_address: 172.18.0.11

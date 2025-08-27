@@ -15,3 +15,5 @@ cat <<EOF > "${CEFORE_CONF}"
 log_level debug # ログレベルをデバッグに設定
 # その他の共通設定があればここに追加
 EOF
+
+. /app/bash/init_cefnetd.sh
