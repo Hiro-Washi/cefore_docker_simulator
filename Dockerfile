@@ -61,4 +61,5 @@ COPY ./bash/entrypoint.sh /app # /usr/local/bin/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh #/usr/local/bin/entrypoint.sh
 
 # コンテナ起動時に実行されるエントリーポイント
-ENTRYPOINT ["/app/entrypoint.sh"] #"/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT ["/app/entrypoint.sh"]
+#"/usr/local/bin/entrypoint.sh"]

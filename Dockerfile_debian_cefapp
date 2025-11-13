@@ -44,7 +44,7 @@ RUN aclocal
 RUN automake && \
     ./configure --enable-csmgr --enable-cache && \
     make && \
-    make install && \
+    make install && \ # sudo 
     ldconfig
 ## Cefpyco
 WORKDIR /tmp
@@ -60,6 +60,7 @@ RUN . venvcef/bin/activate && \
     cmake . && \
     make && \
     make install
+# sudo /home/{User Name}/venvcef/bin/pip {python cefapp}
 
 # App tools
 #pip install opencv-python numpy pandas

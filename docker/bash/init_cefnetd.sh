@@ -6,15 +6,16 @@ sudo sysctl -w net.core.wmem_max=10000000
 #sudo rm /tmp/cef_9896.0
 sudo cefnetdstop -F
 sleep 1
-sudo csmgrdstop
+sudo csmgrdstop -F
 sleep 1
 sudo csmgrdstart
 sleep 1
 
 echo "env NODE_TYPE: $NODE_TYPE"
-if [ $1 -eq "unknown" ]; then
+echo "$#"
+if [ $1 = "unknown" ]; then
     sudo cefnetdstart
-elif [ "$#" -eq 0 ]; then
+elif [ $# -eq 0 ]; then
     sudo cefnetdstart
 elif [ $1 = "router" ]; then
     sudo cefnetdstart -d r_cefnetd.conf
