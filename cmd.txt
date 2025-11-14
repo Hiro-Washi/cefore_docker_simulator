@@ -5,6 +5,7 @@ or cat /etc/resolv.conf | grep nameserver : nameserver 192.168.176.1
 
 # Tshark
 sudo apt install wireshark tshark
+ln -s <WORKING_DIR>/cefore-dissector/cefire.lua ~/.config/wireshark/plugins/cefore.lua
 sudo tshark -D
 tshark -i enp0s31f6 -f "ccnx" -w ts.pcap -a duration:10
 tshark -i wlp0s20f3 -f "ccnx" -w ts.pcap -a duration:10

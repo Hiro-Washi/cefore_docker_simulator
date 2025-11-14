@@ -1,0 +1,109 @@
+
+services:
+  # --- クライアント側 ---
+  client:
+    image: cefuntu-all
+    container_name: client
+    cap_add: [ "NET_ADMIN" ]
+    tty: true
+    networks:
+      cefore_network:
+        ipv4_address: 172.18.0.10 # 固定IP
+    volumes:
+      - ./config/client_setup.sh:/root/setup.sh
+    entrypoint: /root/setup.sh
+
+  nonoichi:
+    image: cefore/cefore
+    container_name: nonoichi
+    cap_add: [ "NET_ADMIN" ]
+    tty: true
+    networks:
+      cefore_network:
+        ipv4_address: 172.18.0.11 # 固定IP
+    volumes:
+      - ./config/nonoichi_setup.sh:/root/setup.sh
+    entrypoint: /root/setup.sh
+
+# --- サーバー側 ---
+  server:
+    image: cefore/cefore
+    container_name: server
+    cap_add: [ "NET_ADMIN" ]
+    tty: true
+    networks:
+      cefore_network:
+        ipv4_address: 172.18.0.30 # 固定IP
+    volumes:
+      - ./config/server_setup.sh:/root/setup.sh
+    entrypoint: /root/setup.sh
+
+  # --- ルータ群 ---
+  tokyo:
+    image: cefore/cefore
+    container_name: tokyo
+    cap_add: [ "NET_ADMIN" ]
+    tty: true
+    networks:
+      cefore_network:
+        ipv4_address: 172.18.0.50 # 固定IP
+    volumes:
+      - ./config/tokyo_setup.sh:/root/setup.sh
+    entrypoint: /root/setup.sh
+
+  nagoya:
+    image: cefore/cefore
+    container_name: nagoya
+    cap_add: [ "NET_ADMIN" ]
+    tty: true
+    networks:
+      cefore_network:
+        ipv4_address: 172.18.0.51 # 固定IP
+    volumes:
+      - ./config/nagoya_setup.sh:/root/setup.sh
+    entrypoint: /root/setup.sh
+  
+  osaka:
+    image: cefore/cefore
+    container_name: osaka
+    cap_add: [ "NET_ADMIN" ]
+    tty: true
+    networks:
+      cefore_network:
+        ipv4_address: 172.18.0.52 # 固定IP
+    volumes:
+      - ./config/osaka_setup.sh:/root/setup.sh
+    entrypoint: /root/setup.sh
+
+  sendai:
+    image: cefore/cefore
+    container_name: sendai
+    cap_add: [ "NET_ADMIN" ]
+    tty: true
+    networks:
+      cefore_network:
+        ipv4_address: 172.18.0.53 # 固定IP
+    volumes:
+      - ./config/sendai_setup.sh:/root/setup.sh
+    entrypoint: /root/setup.sh
+
+  ishikawa:
+    image: cefore/cefore
+    container_name: ishikawa
+    cap_add: [ "NET_ADMIN" ]
+    tty: true
+    networks:
+      cefore_network:
+        ipv4_address: 172.18.0.54 # 固定IP
+    volumes:
+      - ./config/ishikawa_setup.sh:/root/setup.sh
+    entrypoint: /root/setup.sh
+
+networks:
+  cefore_network:
+    external: true # "cefore_network"という名前の既存ネットワークを単に"利用する"  docker network create --driver=bridge --subnet=172.18.0.0/24 cefore_network
+    driver: bridge          # <-- (A) L2の定義
+    ipam:
+      config:
+        - subnet: 172.18.0.0/24 # <-- (B) L3の定義
+

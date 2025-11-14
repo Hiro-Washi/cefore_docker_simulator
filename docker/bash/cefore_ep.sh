@@ -14,5 +14,7 @@ echo "Ceforeノードを開始します: ${NODE_NAME} (ノードタイプ: ${NOD
 # その他の共通設定があればここに追加
 #EOF
 
-. /docker/bash/init_cefnetd.sh $NODE_TYPE
-. /tmp/
+sudo /docker/bash/init_cefnetd.sh # /docker/bash/init_cef.sh $NODE_TYPE
+echo "Starting Cefnetd..."
+# Ceforeデーモンが常にフォアグラウンドで実行されるように待機
+wait ${CEFORE_PID}

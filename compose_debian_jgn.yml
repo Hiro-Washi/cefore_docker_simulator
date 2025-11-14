@@ -1,0 +1,142 @@
+services:
+  # --- 1. 東京ノード ---
+  # 接続: nagoya, osaka, sendai, ishikawa
+  tokyo:
+    image: debian-cefore-router # CeforeのDockerイメージを指定
+    container_name: tokyo
+    cap_add: [ "NET_ADMIN" ] # ネットワーク設定変更（ルート追加など）の権限
+    tty: true                # コンテナを起動し続ける
+    networks:
+      - link_tokyo_nagoya: ipv4_address: 172.18.0.11
+      - link_tokyo_osaka
+      - link_tokyo_sendai
+      - link_tokyo_ishikawa
+    environment:
+      - NODE_TYPE=router
+    volumes:
+      - ./config/tokyo_setup.sh:/root/setup.sh # Cefore設定用スクリプトをマウント
+    entrypoint: /root/setup.sh                 # コンテナ起動時にスクリプトを実行
+
+  # --- 2. 名古屋ノード ---
+  # 接続: tokyo, osaka, server
+  nagoya:
+    image: cefore/cefore
+    container_name: nagoya
+    cap_add: [ "NET_ADMIN" ]
+    tty: true
+    networks:
+      - link_tokyo_nagoya
+      - link_nagoya_osaka
+      - link_nagoya_server
+    volumes:
+      - ./config/nagoya_setup.sh:/root/setup.sh
+    entrypoint: /root/setup.sh
+
+  # --- 3. 大阪ノード ---
+  # 接続: tokyo, nagoya, ishikawa
+  osaka:
+    image: cefore/cefore
+    container_name: osaka
+    cap_add: [ "NET_ADMIN" ]
+    tty: true
+    networks:
+      - link_tokyo_osaka
+      - link_nagoya_osaka
+      - link_osaka_ishikawa
+    volumes:
+      - ./config/osaka_setup.sh:/root/setup.sh
+    entrypoint: /root/setup.sh
+
+  # --- 4. 仙台ノード ---
+  # 接続: tokyo, ishikawa
+  sendai:
+    image: cefore/cefore
+    container_name: sendai
+    cap_add: [ "NET_ADMIN" ]
+    tty: true
+    networks:
+      - link_tokyo_sendai
+      - link_sendai_ishikawa
+    volumes:
+      - ./config/sendai_setup.sh:/root/setup.sh
+    entrypoint: /root/setup.sh
+
+  # --- 5. 石川ノード ---
+  # 接続: tokyo, osaka, sendai, nonoichi, client
+  ishikawa:
+    image: cefore/cefore
+    container_name: ishikawa
+    cap_add: [ "NET_ADMIN" ]
+    tty: true
+    networks:
+      - link_tokyo_ishikawa
+      - link_osaka_ishikawa
+      - link_sendai_ishikawa
+      - link_ishikawa_nonoichi
+      - link_ishikawa_client
+    volumes:
+      - ./config/ishikawa_setup.sh:/root/setup.sh
+    entrypoint: /root/setup.sh
+
+  # --- 6. 野々市ノード ---
+  # 接続: ishikawa
+  nonoichi:
+    image: cefore/cefore
+    container_name: nonoichi
+    cap_add: [ "NET_ADMIN" ]
+    tty: true
+    networks:
+      - link_ishikawa_nonoichi
+    volumes:
+      - ./config/nonoichi_setup.sh:/root/setup.sh
+    entrypoint: /root/setup.sh
+
+  # --- 7. サーバーノード ---
+  # 接続: nagoya
+  server:
+    image: cefore/cefore
+    container_name: server
+    cap_add: [ "NET_ADMIN" ]
+    tty: true
+    networks:
+      - link_nagoya_server
+    volumes:
+      - ./config/server_setup.sh:/root/setup.sh
+    entrypoint: /root/setup.sh
+
+  # --- 8. クライアントノード ---
+  # 接続: ishikawa
+  client:
+    image: cefore/cefore
+    container_name: client
+    cap_add: [ "NET_ADMIN" ]
+    tty: true
+    networks:
+      - link_ishikawa_client
+    volumes:
+      - ./config/client_setup.sh:/root/setup.sh
+    entrypoint: /root/setup.sh
+
+# --- ネットワーク定義 (10本のリンク) ---
+# これら全てが個別のL2セグメント（ブリッジネットワーク）として作成されます
+networks:
+  link_tokyo_nagoya:
+    driver: bridge
+  link_tokyo_osaka:
+    driver: bridge
+  link_tokyo_sendai:
+    driver: bridge
+  link_tokyo_ishikawa:
+    driver: bridge
+  link_nagoya_osaka:
+    driver: bridge
+  link_nagoya_server:
+    driver: bridge
+  link_osaka_ishikawa:
+    driver: bridge
+  link_sendai_ishikawa:
+    driver: bridge
+  link_ishikawa_nonoichi:
+    driver: bridge
+  link_ishikawa_client:
+    driver: bridge

@@ -18,6 +18,7 @@ if [ $1 = "unknown" ]; then
 elif [ $# -eq 0 ]; then
     sudo cefnetdstart
 elif [ $1 = "router" ]; then
+    #sudo cefcsmgrstart -f ../config/r/
     sudo cefnetdstart -d r_cefnetd.conf
 elif [ $1 = "producer" ]; then
     sudo cefnetdstart -d p_cefnetd.conf
