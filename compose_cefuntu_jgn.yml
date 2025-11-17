@@ -1,29 +1,45 @@
 
 services:
   # --- クライアント側 ---
-  client:
+  client1:
     image: cefuntu-all
-    container_name: client
-    cap_add: [ "NET_ADMIN" ]
+    container_name: c1-nonoichi
+    hostname: c1-nonoichi
+    environment:
+      - NODE_TYPE=client
+    cap_add:
+      - "NET_ADMIN"
+      - SYS_ADMIN
+    privileged: true
     tty: true
     networks:
       cefore_network:
-        ipv4_address: 172.18.0.10 # 固定IP
+        ipv4_address: 172.18.0.1 # 固定IP
     volumes:
-      - ./config/client_setup.sh:/root/setup.sh
-    entrypoint: /root/setup.sh
+      - type: bind
+        source: ./docker
+        target: /docker
+    entrypoint: /docker/init_cefnetd.sh
 
-  nonoichi:
-    image: cefore/cefore
-    container_name: nonoichi
-    cap_add: [ "NET_ADMIN" ]
+  client2:
+    image: cefuntu-all
+    container_name: c2-nonoichi
+    hostname: c2-nonoichi
+    environment:
+      - NODE_TYPE=client
+    cap_add:
+      - "NET_ADMIN"
+      - SYS_ADMIN
+    privileged: true
     tty: true
     networks:
       cefore_network:
-        ipv4_address: 172.18.0.11 # 固定IP
+        ipv4_address: 172.18.0.2 # 固定IP
     volumes:
-      - ./config/nonoichi_setup.sh:/root/setup.sh
-    entrypoint: /root/setup.sh
+      - type: bind
+        source: ./docker
+        target: /docker
+    entrypoint: /docker/init_cefnetd.sh
 
 # --- サーバー側 ---
   server:
@@ -39,69 +55,129 @@ services:
     entrypoint: /root/setup.sh
 
   # --- ルータ群 ---
-  tokyo:
-    image: cefore/cefore
-    container_name: tokyo
-    cap_add: [ "NET_ADMIN" ]
+  r1-nonoichi:
+    image: cefuntu-all
+    container_name: r1-nonoichi
+    hostname: r1-nonoichi
+    environment:
+      - NODE_TYPE=router
+    cap_add:
+      - "NET_ADMIN"
+      - SYS_ADMIN
+    privileged: true
+    tty: true
+    networks:
+      cefore_network:
+        ipv4_address: 172.18.0.11 # 固定IP
+    volumes:
+      - type: bind
+        source: ./docker
+        target: /docker
+    entrypoint: /docker/init_cefnetd.sh
+  
+   r2-tokyo:
+    image: cefuntu-all
+    container_name: r2-tokyo
+    hostname: r2-tokyo
+    environment:
+      - NODE_TYPE=router
+    cap_add:
+      - "NET_ADMIN"
+      - SYS_ADMIN
+    privileged: true
     tty: true
     networks:
       cefore_network:
         ipv4_address: 172.18.0.50 # 固定IP
     volumes:
-      - ./config/tokyo_setup.sh:/root/setup.sh
-    entrypoint: /root/setup.sh
+      - type: bind
+        source: ./docker
+        target: /docker
+    entrypoint: /docker/init_cefnetd.sh
 
-  nagoya:
-    image: cefore/cefore
-    container_name: nagoya
-    cap_add: [ "NET_ADMIN" ]
+   r3-nagoya:
+    image: cefuntu-all
+    container_name: r3-nagoya
+    hostname: r3-nagoya
+    environment:
+      - NODE_TYPE=router
+    cap_add:
+      - "NET_ADMIN"
+      - SYS_ADMIN
+    privileged: true
     tty: true
     networks:
       cefore_network:
         ipv4_address: 172.18.0.51 # 固定IP
     volumes:
-      - ./config/nagoya_setup.sh:/root/setup.sh
-    entrypoint: /root/setup.sh
-  
-  osaka:
-    image: cefore/cefore
-    container_name: osaka
-    cap_add: [ "NET_ADMIN" ]
+      - type: bind
+        source: ./docker
+        target: /docker
+    entrypoint: /docker/init_cefnetd.sh
+
+   r4-osaka:
+    image: cefuntu-all
+    container_name: r4-osaka
+    hostname: r4-osaka
+    environment:
+      - NODE_TYPE=router
+    cap_add:
+      - "NET_ADMIN"
+      - SYS_ADMIN
+    privileged: true
     tty: true
     networks:
       cefore_network:
         ipv4_address: 172.18.0.52 # 固定IP
     volumes:
-      - ./config/osaka_setup.sh:/root/setup.sh
-    entrypoint: /root/setup.sh
+      - type: bind
+        source: ./docker
+        target: /docker
+    entrypoint: /docker/init_cefnetd.sh
 
-  sendai:
-    image: cefore/cefore
-    container_name: sendai
-    cap_add: [ "NET_ADMIN" ]
+   r5-sendai:
+    image: cefuntu-all
+    container_name: r5-sendai
+    hostname: r5-sendai
+    environment:
+      - NODE_TYPE=router
+    cap_add:
+      - "NET_ADMIN"
+      - SYS_ADMIN
+    privileged: true
     tty: true
     networks:
       cefore_network:
         ipv4_address: 172.18.0.53 # 固定IP
     volumes:
-      - ./config/sendai_setup.sh:/root/setup.sh
-    entrypoint: /root/setup.sh
+      - type: bind
+        source: ./docker
+        target: /docker
+    entrypoint: /docker/init_cefnetd.sh
 
-  ishikawa:
-    image: cefore/cefore
-    container_name: ishikawa
-    cap_add: [ "NET_ADMIN" ]
+   r6-ishikawa:
+    image: cefuntu-all
+    container_name: r6-ishikawa
+    hostname: r6-ishikawa
+    environment:
+      - NODE_TYPE=router
+    cap_add:
+      - "NET_ADMIN"
+      - SYS_ADMIN
+    privileged: true
     tty: true
     networks:
       cefore_network:
         ipv4_address: 172.18.0.54 # 固定IP
     volumes:
-      - ./config/ishikawa_setup.sh:/root/setup.sh
-    entrypoint: /root/setup.sh
+      - type: bind
+        source: ./docker
+        target: /docker
+    entrypoint: /docker/init_cefnetd.sh
 
 networks:
   cefore_network:
-    external: true # "cefore_network"という名前の既存ネットワークを単に"利用する"  docker network create --driver=bridge --subnet=172.18.0.0/24 cefore_network
+    external: true # "cefore_network"という名前の既存ネットワークを単に"利用する"  docker network create --driver=bridge --subnet=172.19.0.0/24 cefore_network
     driver: bridge          # <-- (A) L2の定義
     ipam:
       config:

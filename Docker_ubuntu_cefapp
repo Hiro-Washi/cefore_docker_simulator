@@ -5,18 +5,20 @@ FROM linuxcontainers/debian-slim:latest
 LABEL description="Cefore v0.11.0 on Debian Slim"
 
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt update --fix-missing && apt -y upgrade
-#RUN apt update --fix-missing
+RUN apt update && apt -y upgrade
+RUN apt update --fix-missing
 RUN apt install -y --no-install-recommends \
     sudo \
     libssl-dev \
     make \
+    cmake \
     automake \
     build-essential \
     procps \
     unzip \
     python3-pip \
-    python3-venv
+    python3-venv \
+    python3-dev
 #RUN rm -rf /var/lib/apt/lists/*
 
 # Dockerのボリューム機能でホストのファイルをコンテナにマウントした際のパーミッション問題を防ぐ
@@ -29,10 +31,10 @@ RUN groupadd -g ${GROUP_ID} dockeruser && useradd -u ${USER_ID} -g ${GROUP_ID} -
 RUN mkdir -p /docker
 
 WORKDIR /tmp
-COPY v0.11.0.zip cefpyco-master.zip cefbebel.zip .
+COPY v0.11.0.zip cefpyco-master.zip .
 RUN unzip v0.11.0.zip -d .
 RUN unzip cefpyco-master.zip -d .
-RUN unzip cefbebel.zip -d .
+#RUN unzip cefbabel.zip -d .
 
 # Build
 ## Cefore
@@ -42,29 +44,31 @@ RUN aclocal
 RUN automake && \
     ./configure --enable-csmgr --enable-cache && \
     make && \
-    make install && \ # sudo 
+    make install && \
     ldconfig
 
 ## Cefpyco
 WORKDIR /tmp
-#RUN apt update --fix-missing && apt install -y python3-dev wget
-RUN apt install cmake python3-dev -y
-#wget https://github.com/cefore/cefpyco/archive/refs/heads/master.zip
 #unzip master.zip -d .
 RUN python3 -m venv venvcef
-RUN . venvcef/bin/activate && \
-    pip3 install --upgrade build && \
-    pip3 install numpy click rich pytest pytest-sugar && \
-    cd cefpyco-master && \
-    cmake . && \
-    make && \
-    make install && \
+#RUN . venvcef/bin/activate
+RUN venvcef/bin/pip3 install --upgrade pip build setuptools && \
+    venvcef/bin/pip3 install wheel numpy click rich pytest pytest-sugar
+WORKDIR /tmp/cefpyco-master
+RUN echo `ls` >> /docker/ls.txt
+RUN cmake . #-DPYTHON_EXECUTABLE=/tmp/venvcef/bin/python3
+RUN sed -i 's|execute_process(COMMAND /usr/bin/python3 -m build|execute_process(COMMAND /tmp/venvcef/bin/python3 -m build|g' cmake_install.cmake
+RUN sed -i 's|execute_process(COMMAND /usr/bin/python3 -m pip install|execute_process(COMMAND /tmp/venvcef/bin/python3 -m pip install|g' cmake_install.cmake
+RUN make
+RUN make install && \
     ldconfig
 # sudo /home/{User Name}/venvcef/bin/pip {python cefapp}
 
 ## Cefbabel
 WORKDIR /tmp
-RUN unzip cefbabel.zip && cd cefbabel-main
+COPY cefbabel.zip .
+RUN unzip cefbabel.zip -d .
+WORKDIR /tmp/cefbabel-main
 RUN make && make install  && ldconfig
 
 # App tools
@@ -72,7 +76,10 @@ RUN make && make install  && ldconfig
 #apt update --fix-missing
 #apt -y install libopencv-dev --fix-missing
 
-RUN rm -rf /tmp/*
+RUN rm -rf /tmp/* 
+RUN apt purge -y make cmake automake build-essential unzip wget network-manager && \
+    apt autoremove -y && \
+    rm -r /var/lib/apt/lists/*
 
 # ./debian/
 #COPY ./
